@@ -1,0 +1,24 @@
+#!/bin/bash
+
+input="input.txt"
+
+count=0
+
+while IFS= read -r line
+do
+  currentValue="$line"
+  if [ $count -le 0 ]; then
+    ((count++))
+    continue
+  fi
+  echo "$currentValue"
+  if [ $currentValue -gt $prevValue ]; then
+    ((count++))
+  fi
+
+  prevValue=$currentValue
+
+done < "$input"
+
+
+echo "Number of increases $count"

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+input="input.txt"
+
+window1Count=0
+window2Count=0
+
+count=0
+
+while IFS= read -r line
+do
+  currentValue="$line"
+  values[(($count % 4))]=$currentValue
+
+  echo $currentValue
+
+  if [ $count -le 2 ]; then
+    ((count++))
+    continue
+  fi
+
+  for i in {0..2}
+  do
+    ((window1Count+=${values[$((i % 4))]}))
+    ((window2Count+=${values[$(((i + 1) % 4))]}))
+
+    echo "A: $window1Count B:$window2Count"
+  done
+
+  if [ $window2Count -gt $window1Count ]; then
+    ((count++))
+  fi
+
+  window1Count=0
+  window2Count=0
+
+done < "$input"
+
+echo "Number of increases $count"
