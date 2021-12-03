@@ -1,0 +1,41 @@
+#!/bin/bash
+# Bash arrays https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays
+# Bash Integer context https://linuxize.com/post/bash-increment-decrement-variable/ 
+
+# Input file
+input="input.txt"
+
+# Current Depth 
+depth=0
+
+# Current Horizontal distance
+horizontal=0
+
+# Read each line from the file into $line
+while IFS= read -r line
+do
+
+  # The line comprises 2 parts command and a value
+  tokens=( $line )
+
+  # Extract the command and extent
+  command=${tokens[0]}
+  distance=${tokens[1]}
+
+  case $command in 
+    "down")
+    ((depth+=distance))
+    ;;
+    "up")
+    ((depth-=distance))
+    ;;
+    "forward")
+    ((horizontal+=distance))
+    ;;
+  esac
+
+done < "$input"
+
+# Output the product of the horizontal position and depth
+product=$((depth * horizontal))
+echo "Product $product"
