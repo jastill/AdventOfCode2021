@@ -1,44 +1,54 @@
 #!/bin/bash
 
+# Input file
 input="input.txt"
 
-window1Count=0
-window2Count=0
+# Sum for windows
+window1Sum=0
+window2Sum=0
 
+# Count the number of lines in the file
 count=0
+
+# How many correct answers are found?
 outputCount=0
 
 while IFS= read -r line
 do
-  currentValue="$line"
+  # The position in the 4 value array of the most current value, end of the second window
   arrayPosition=$((count % 4))
+
+  # The position in the array of the oldest value, start of the first window
   oldestValue=$(((arrayPosition+1) % 4))
-  values[$arrayPosition]=$currentValue
 
-  echo "$currentValue"
+  # Put the newest read value into the array
+  values[$arrayPosition]=$line
 
-  if [ $count -le 2 ]; then
-    ((count++))
+  # Debug Code.....
+  echo "$line"
+
+  # if we don't have enough readings (index starts at 0), don't compare
+  ((count++))
+  if [ $count -le 3 ]; then
     continue
   fi
 
-  ((count++))
-
+  # Each window is 3 values, loop and sum
   for i in {0..2}
   do
-    ((window1Count+=${values[$(((oldestValue+i) % 4))]}))
-    ((window2Count+=${values[$(((oldestValue+i+1) % 4))]}))
-
+    ((window1Sum+=${values[$(((oldestValue+i) % 4))]}))
+    ((window2Sum+=${values[$(((oldestValue+i+1) % 4))]}))
   done
 
-  echo "A: $window1Count B:$window2Count"
-
-  if [ $window2Count -gt $window1Count ]; then
+  # Compare the sum of each window
+  if [ $window2Sum -gt $window1Sum ]; then
+    echo "A: $window1Sum B:$window2Sum"
     ((outputCount++))
   fi
 
-  window1Count=0
-  window2Count=0
+  # Reset the sum values
+  window1Sum=0
+  window2Sum=0
 
 done < "$input"
 
