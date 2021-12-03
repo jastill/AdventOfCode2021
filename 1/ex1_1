@@ -1,24 +1,37 @@
 #!/bin/bash
 
+# Input file
 input="input.txt"
 
+# Count for the number of increases found
 count=0
 
+# Start the previous value with an invalid value
+prevValue=-1
+
+# Read each line from the file into $line
 while IFS= read -r line
 do
-  currentValue="$line"
-  if [ $count -le 0 ]; then
-    ((count++))
+
+  # Make sure we are not on the first row
+  if [ $prevValue -le 0 ]; then
+    prevValue=$((line))
     continue
   fi
-  echo "$currentValue"
-  if [ $currentValue -gt $prevValue ]; then
+
+  # Debug code... 
+  echo "$line"
+
+  # If the current value is greater than the previous value, increment the count
+  if [ $((line)) -gt $((prevValue)) ]; then
+    echo "$line > $prevValue"
     ((count++))
   fi
 
-  prevValue=$currentValue
+  # Store the previous value so we have it next time around the loop
+  prevValue=$line
 
 done < "$input"
 
-
+# Output the number of increases found.
 echo "Number of increases $count"

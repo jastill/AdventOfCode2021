@@ -6,29 +6,35 @@ window1Count=0
 window2Count=0
 
 count=0
+outputCount=0
 
 while IFS= read -r line
 do
   currentValue="$line"
-  values[(($count % 4))]=$currentValue
+  arrayPosition=$((count % 4))
+  oldestValue=$(((arrayPosition+1) % 4))
+  values[$arrayPosition]=$currentValue
 
-  echo $currentValue
+  echo "$currentValue"
 
   if [ $count -le 2 ]; then
     ((count++))
     continue
   fi
 
+  ((count++))
+
   for i in {0..2}
   do
-    ((window1Count+=${values[$((i % 4))]}))
-    ((window2Count+=${values[$(((i + 1) % 4))]}))
+    ((window1Count+=${values[$(((oldestValue+i) % 4))]}))
+    ((window2Count+=${values[$(((oldestValue+i+1) % 4))]}))
 
-    echo "A: $window1Count B:$window2Count"
   done
 
+  echo "A: $window1Count B:$window2Count"
+
   if [ $window2Count -gt $window1Count ]; then
-    ((count++))
+    ((outputCount++))
   fi
 
   window1Count=0
@@ -36,4 +42,4 @@ do
 
 done < "$input"
 
-echo "Number of increases $count"
+echo "Number of increases $outputCount"
