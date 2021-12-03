@@ -8,33 +8,58 @@ input="input.txt"
 gammeRate=0
 epsilonRate=0
 
+linesCount=0
+numColumns=0
+
+columns=0
 
 # Read each line from the file into $line
 while IFS= read -r line
 do
+  ((linescount++))
 
-  # The line comprises a 5 bit binary number
-  tokens=( $line )
+  # Determine the number of columns
+  if [ $numColumns -eq 0 ]; then
+    numColumns=${#line}
 
-  # Extract the command and extent
-  command=${tokens[0]}
-  distance=${tokens[1]}
+    for (( i=0; i<numColumns; i++ ))
+    do
+      columns[$i]=0
+    done
+  fi
 
-  case $command in 
-    "down")
-    ((depth+=distance))
-    ;;
-    "up")
-    ((depth-=distance))
-    ;;
-    "forward")
-    ((horizontal+=distance))
-    ;;
-  esac
+  # Sum the colums
+  for (( i=0; i<numColumns; i++ ))
+  do
+    columnValue=${line:$i:1}
+    ((columns[i]+=columnValue))
+  done
 
 done < "$input"
 
+# Convert to binary in each column
+for (( i=0; i<numColumns; i++ ))
+do
+  sum=${columns[i]}
+  threshold=$((linescount/2))
+  ((columns[i]=0))
+  if [ $sum -gt $threshold ]; then
+    ((columns[i]=1))
+  fi
+  
+  # Calculate Gamma
+  power=$((numColumns-1-i))
+  ((gammaRate+=columns[i]*(2**power)))
+done
 
+# Show the binary output
+echo "${columns[@]}"
 
+echo "Gamma Rate $gammaRate"
+
+# This is the inverse, so use math(s)
+epsilonRate=$((2**12-gammaRate-1))
+echo "Epsilon Rate $epsilonRate"
 
 powerConsumption=$((gammaRate*epsilonRate))
+echo "Power Consumption $powerConsumption"
