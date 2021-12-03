@@ -4,3 +4,37 @@
 
 # Input file
 input="input.txt"
+
+gammeRate=0
+epsilonRate=0
+
+
+# Read each line from the file into $line
+while IFS= read -r line
+do
+
+  # The line comprises a 5 bit binary number
+  tokens=( $line )
+
+  # Extract the command and extent
+  command=${tokens[0]}
+  distance=${tokens[1]}
+
+  case $command in 
+    "down")
+    ((depth+=distance))
+    ;;
+    "up")
+    ((depth-=distance))
+    ;;
+    "forward")
+    ((horizontal+=distance))
+    ;;
+  esac
+
+done < "$input"
+
+
+
+
+powerConsumption=$((gammaRate*epsilonRate))
