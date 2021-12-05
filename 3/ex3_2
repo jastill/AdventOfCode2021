@@ -1,0 +1,69 @@
+#!/bin/bash
+# Bash arrays https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays
+# Bash Integer context https://linuxize.com/post/bash-increment-decrement-variable/ 
+
+# Input file
+input="input.txt"
+
+lifeSupportRating=0
+oxygenGeneratorRating=0
+co2ScrubberRating=0
+
+numColumns=0
+
+# Arrays for storing entries
+declare -a onesArray
+declare -a zerosArray
+declare -a mostCommon
+
+# Read the file.
+mapfile -t data < $input
+
+# Determine number of columms
+numColumns=${#data[0]}
+
+
+# For each column find the most common bit (Oxygen) and least common co2
+# i.e. opposites
+numLines=${#data[*]}
+
+mostCommon=("${data[@]}")
+
+for (( column=0; column<numColumns; column++ ))
+do
+  for (( row=0; row<numLines; row++ ))
+  do
+
+    # Split the array by 1 and 0 and store the indexes
+    line=${mostCommon[$row]}
+    checkBit=${line:$column:1}
+
+    echo "Check bit: $checkBit"
+
+    if [ "$checkBit" -eq "1" ]; then
+      onesArray+=("${mostCommon[$row]}")
+    else
+      zerosArray+=("${mostCommon[$row]}")
+    fi 
+
+    # Check 
+    onesSize=${#onesArray[@]}
+    zerosSize=${#zerosArray[@]}
+
+    # Most common time, most common or ones if equal
+    if [ $onesSize -ge $zerosSize ]; then
+      # Loop 
+      data=("${onesArray[@]}")
+    else
+      data=("${zerosArray[@]}")
+    fi
+
+  done
+done
+
+# Show the binary output
+#echo "Ones Array: " "${onesArray[@]}"
+#echo "Zeroes Array: " "${zerosArray[@]}"
+
+lifeSupportRating=$((oxygenGeneratorRating*co2ScrubberRating))
+echo "Life Support Rating: $lifeSupportRating"
